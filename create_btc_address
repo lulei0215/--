@@ -1,0 +1,59 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"log"
+	"encoding/hex"
+	"github.com/btcsuite/btcd/btcec"
+	"github.com/btcsuite/btcutil"
+	"github.com/btcsuite/btcd/chaincfg"
+)
+
+func main() {
+	// 创建一个新的文件
+	f, err := os.Create("wallets.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	// 接收键盘输入
+	var num int
+	fmt.Print("请输入要生成的地址和私钥的数量: ")
+	_, err = fmt.Scan(&num)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 生成指定数量的地址和私钥，并写入到文件中
+	for i := 0; i < num; i++ {
+		// 生成私钥
+		privateKey, err := btcec.NewPrivateKey(btcec.S256())
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 生成公钥
+		pubKey := privateKey.PubKey()
+
+		// 生成地址
+		address, err := btcutil.NewAddressPubKey(pubKey.SerializeCompressed(), &chaincfg.MainNetParams)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 将私钥转换为字节切片，然后转换为十六进制字符串
+		privateKeyBytes := privateKey.Serialize()
+		privateKeyStr := hex.EncodeToString(privateKeyBytes)
+
+		// 写入到文件中
+		_, err = f.WriteString(fmt.Sprintf("地址%d: %s\n私钥%d: %s\n", i+1, address.EncodeAddress(), i+1, privateKeyStr))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	fmt.Println("地址和私钥已保存到 wallets.txt 文件中")
+}
+

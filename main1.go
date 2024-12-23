@@ -129,6 +129,3 @@ func main() {
 		fmt.Println("无效的操作类型。请输入1或2。")
 	}
 }
-
-
-apple banana cherry date elderberry fig grape honeydew kiwi lemon melon nectarine orange papaya pear
